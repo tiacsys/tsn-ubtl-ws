@@ -1,0 +1,7 @@
+{
+	"include": [
+		{ "stage": "base" },
+		{ "stage": "latex" },
+		{ "stage": "push", "ghr-free-disk": false }
+	]
+}
