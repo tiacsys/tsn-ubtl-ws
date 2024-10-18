@@ -61,6 +61,10 @@ WORKDIR /
 # ############################################################################
 
 # Install requirements
+#
+# Installation without option ``--no-install-recommends``, since almost
+# all tools, packages and fonts are linked as recommendations only!
+#
 RUN apt-get --assume-yes update \
  && apt-get --assume-yes dist-upgrade \
  && apt-get --assume-yes install \
@@ -116,17 +120,6 @@ RUN apt-get --assume-yes update \
 #                                                                     ┏┓┓ ┓
 #   All architectures maintenance for TeX Live (only LaTeX)           ┣┫┃ ┃
 #                                                                     ┛┗┗┛┗┛
-# Installation without option ``--no-install-recommends``, since almost
-# all tools, packages, styles, templates and fonts are linked as
-# recommendations only!
-#
-# - linux/amd64:     ~2 minutes
-# - linux/arm/v7:   ~15 minutes
-# - linux/arm64/v8:  ~2 hours
-# - linux/riscv64:  ~10 minutes
-# - linux/ppc64le:  ~10 minutes
-# - linux/s390x:    ~15 minutes
-#
 # ############################################################################
 
 FROM base AS latex-all
@@ -153,6 +146,235 @@ RUN apt-get --assume-yes update \
 # ############################################################################
 
 FROM latex-all AS latex
+
+
+#  -- about 3 hours
+#  ________________________________
+#      _____
+#      /    '
+#  ---/__-------__----__--_/_---__-
+#    /        /   ) /   ) /    (_ `
+#  _/________(___/_/___/_(_ __(__)_
+#
+#
+
+# ############################################################################
+#                                                                     ┏┓┓ ┓
+#   All architectures maintenance for TeX Live: all fonts             ┣┫┃ ┃
+#                                                                     ┛┗┗┛┗┛
+#
+# Installation without option ``--no-install-recommends``, since almost
+# all tools, packages, styles, templates and fonts are linked as
+# recommendations only!
+#
+# ############################################################################
+
+FROM latex AS fonts-all
+
+# Install requirements
+RUN apt-get --assume-yes update \
+ && apt-get --assume-yes dist-upgrade \
+ && apt-get --assume-yes install \
+    cm-super \
+    fonts-arphic-ukai \
+    fonts-arphic-uming \
+    fonts-cmu \
+    fonts-gfs-baskerville \
+    fonts-gfs-bodoni-classic \
+    fonts-gfs-didot-classic \
+    fonts-gfs-gazis \
+    fonts-gfs-porson \
+    fonts-gfs-theokritos \
+    fonts-hanazono \
+    fonts-hosny-amiri \
+    fonts-nanum \
+    fonts-nanum-eco \
+    fonts-nanum-extra \
+    fonts-noto \
+    fonts-roboto \
+    fonts-roboto-slab \
+    fonts-symbola \
+    latex-cjk-all \
+    tex-gyre \
+    texlive-font-utils \
+    texlive-fonts-extra \
+    texlive-fonts-recommended \
+ && apt-get --assume-yes autoremove --purge \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# ############################################################################
+#                                                                  ┏┓┳┳┓┏┓┓
+#   Final maintenance for TeX Live: all fonts                      ┣ ┃┃┃┣┫┃
+#                                                                  ┻ ┻┛┗┛┗┗┛
+# ############################################################################
+
+FROM fonts-all AS fonts
+
+
+#  -- about 3 hours
+#  ________________________________________________________
+#      _
+#      /
+#  ---/-------__----__----__-----------__----__----__---__-
+#    /      /   ) /   ) /   ) /   /  /   ) /   ) /___) (_ `
+#  _/____/_(___(_/___/_(___/_(___(__(___(_(___/_(___ _(__)_
+#                         /                  /
+#                     (_ /               (_ /
+
+# ############################################################################
+#                                                                     ┏┓┓ ┓
+#   All architectures maintenance for TeX Live: all languages         ┣┫┃ ┃
+#                                                                     ┛┗┗┛┗┛
+# ############################################################################
+
+FROM fonts AS langs-all
+
+# Install requirements
+RUN apt-get --assume-yes update \
+ && apt-get --assume-yes dist-upgrade \
+ && apt-get --assume-yes install --no-install-recommends \
+    texlive-lang-all \
+ && apt-get --assume-yes autoremove --purge \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# ############################################################################
+#                                                                  ┏┓┳┳┓┏┓┓
+#   Final maintenance for TeX Live: all languages                  ┣ ┃┃┃┣┫┃
+#                                                                  ┻ ┻┛┗┛┗┗┛
+# ############################################################################
+
+FROM langs-all AS langs
+
+
+#  -- about 4 hours
+#  ___________________________________________________________________________
+#    ______                           __         _____
+#      /                  /          (  )        /    '
+#  ---/-------__----__---/---__-------\/--------/__-------__----__----__---__-
+#    /      /   ) /   ) /   (_ `     / \       /        /   ) /   ' /___) (_ `
+#  _/______(___/_(___/_/___(__)_____(__ \_____/________(___(_(___ _(___ _(__)_
+#                                        )
+#
+
+# ############################################################################
+#                                                                     ┏┓┓ ┓
+#   All architectures maintenance for TeX Live: tools and TeX faces   ┣┫┃ ┃
+#                                                                     ┛┗┗┛┗┛
+# ############################################################################
+
+FROM langs AS faces-all
+
+# Install requirements
+RUN apt-get --assume-yes update \
+ && apt-get --assume-yes dist-upgrade \
+ && apt-get --assume-yes install --no-install-recommends \
+    docbook-utils \
+    feynmf \
+    lacheck \
+    latexdiff \
+    texlive-extra-utils \
+    texlive-formats-extra \
+    texlive-bibtex-extra \
+    texlive-luatex \
+    texlive-xetex \
+    tipa \
+ && apt-get --assume-yes autoremove --purge \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# ############################################################################
+#                                                                  ┏┓┳┳┓┏┓┓
+#   Final maintenance for TeX Live: tools and TeX faces            ┣ ┃┃┃┣┫┃
+#                                                                  ┻ ┻┛┗┛┗┗┛
+# ############################################################################
+
+FROM faces-all AS faces
+
+
+#  -- about 4 hours
+#  _____________________________________
+#      _____
+#      /    '
+#  ---/__------|/--_/_---)__----__---__-
+#    /         |   /    /   ) /   ) (_ `
+#  _/____ ____/|__(_ __/_____(___(_(__)_
+#            /
+#
+
+# ############################################################################
+#                                                                     ┏┓┓ ┓
+#   All architectures maintenance for TeX Live: packages and styles   ┣┫┃ ┃
+#                                                                     ┛┗┗┛┗┛
+# ############################################################################
+
+FROM faces AS extra-all
+
+# Install requirements
+RUN apt-get --assume-yes update \
+ && apt-get --assume-yes dist-upgrade \
+ && apt-get --assume-yes install --no-install-recommends \
+    context \
+    context-modules \
+    context-nonfree \
+    latexml \
+    texlive-metapost \
+    texlive-pictures \
+    texlive-pstricks \
+    texlive-science \
+ && apt-get --assume-yes autoremove --purge \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# ############################################################################
+#                                                                  ┏┓┳┳┓┏┓┓
+#   Final maintenance for TeX Live: packages and styles            ┣ ┃┃┃┣┫┃
+#                                                                  ┻ ┻┛┗┛┗┗┛
+# ############################################################################
+
+FROM extra-all AS extra
+
+
+#  -- about 5 hours
+#  _________________________________________________________________________
+#      _____                     ______        _  _      _
+#      /    '          /   /       /           | /       /      ,
+#  ---/__-------------/---/-------/-------__---|--------/----------------__-
+#    /        /   /  /   /       /      /___) /|       /      /   | /  /___)
+#  _/________(___(__/___/_______/______(___ _/_|______/____/_/____|/__(___ _
+#
+#
+
+# ############################################################################
+#                                                                     ┏┓┓ ┓
+#   All architectures maintenance for TeX Live: full installation     ┣┫┃ ┃
+#                                                                     ┛┗┗┛┗┛
+#
+# Installation without option ``--no-install-recommends``, since almost
+# all not yet installed tools, packages, styles, templates and fonts are
+# linked as recommendations only!
+#
+# ############################################################################
+
+FROM extra AS full-all
+
+# Install requirements
+RUN apt-get --assume-yes update \
+ && apt-get --assume-yes dist-upgrade \
+ && apt-get --assume-yes install \
+    texlive-full \
+ && apt-get --assume-yes autoremove --purge \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# ############################################################################
+#                                                                  ┏┓┳┳┓┏┓┓
+#   Final maintenance for TeX Live: full installation              ┣ ┃┃┃┣┫┃
+#                                                                  ┻ ┻┛┗┛┗┗┛
+# ############################################################################
+
+FROM full-all AS full
 
 # switch to workspace user
 USER $WSUSER_NAME
