@@ -2,6 +2,11 @@
 	"include": [
 		{ "stage": "base" },
 		{ "stage": "latex" },
+		{ "stage": "fonts" },
+		{ "stage": "langs" },
+		{ "stage": "faces" },
+		{ "stage": "extra" },
+		{ "stage": "full" },
 		{ "stage": "push", "ghr-free-disk": false }
 	]
 }
